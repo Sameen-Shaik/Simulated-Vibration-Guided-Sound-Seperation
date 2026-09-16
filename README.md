@@ -1,246 +1,262 @@
-# Audio Source Separation Guided by Simulated On-Body Vibration Signals
-### for Overlapping Bird Vocalizations
-**DV1478 VT26 — Bachelor's Thesis in Computer Science, BTH**
-*Mahammed Sameen Shaik — Supervisor: Ilir Jusufi*
+# Audio Source Separation Guided by Simulated Vibration Signals
 
----
+Bachelor's thesis implementation, **DV1478 VT26 — Bachelor's Thesis in Computer Science, BTH**.
 
-## Overview
+The project studies whether a simulated body-vibration signal can help a neural
+separator disentangle two overlapping bird vocalisations. The vibration is a
+computational proxy; this repository does not contain real accelerometer or
+contact-microphone measurements.
 
-This repository implements the complete system described in the thesis proposal:
-a multimodal neural audio source separator that uses **per-bird simulated vibration
-signals** as weak supervisory guidance to disentangle overlapping bird vocalizations.
+The authoritative academic artifact is the [final submitted thesis](docs/thesis/Thesis-Final-Submission.pdf).
 
-```
-bird_separation/
-├── data/
-│   └── dataset.py          ← Dataset, VibrationSimulator, DataLoader factory
-├── models/
-│   └── separator.py        ← AudioEncoder, VibrationEncoder, FiLM TCN, Decoder
-├── utils/
-│   ├── losses.py           ← SI-SDR, multi-scale spectral, PIT, combined loss
-│   ├── metrics.py          ← SDR/SIR/SAR/SI-SDR, spectral, statistical tests
-│   └── trainer.py          ← Training loop, LR scheduling, checkpointing
-├── experiments/
-│   ├── evaluate.py         ← Full evaluation + overlap-stratified analysis
-│   └── ablation.py         ← Noise sensitivity & per-bird vs shared vibration
-├── configs/
-│   └── config.yaml         ← All hyperparameters
-├── train.py                ← Main training entry point
-└── infer.py                ← Separate a new mixed WAV file
-```
+## Method
 
----
+The published executable pipeline is a two-source waveform separator with two
+operating modes:
 
-## Dataset Setup
+- `baseline`: audio-only Conv-TasNet-style separation;
+- `multimodal`: the same separation backbone conditioned on a simulated mixture
+  vibration through a vibration encoder and FiLM modulation.
 
-Your dataset layout (Xeno-Canto, 9,107 WAV files, 100 species):
+Each dataset item contains the mixture waveform `Ymix`, clean targets `Y1` and
+`Y2`, mixture vibration `Vmix`, and per-source vibration targets `V1` and `V2`.
+Only `Ymix` reaches both models. `Vmix` is the multimodal conditioning input;
+`V1` and `V2` are used only by the auxiliary training loss and are never passed
+to the model at evaluation time.
 
-```
-your_dataset/
-├── wavfiles/
-│   ├── 544036-0.wav
-│   ├── 544037-0.wav
-│   └── ...
-└── metadata.csv        ← columns: genus, species, filename (+ others)
-```
+The implementation uses:
 
-The system reads `metadata.csv` to group recordings by species (using
-`genus + "_" + species` as the key). Each species needs ≥ 2 files.
-If no CSV is provided, files are grouped by filename prefix automatically.
+- 22,050 Hz mono audio and 3-second clips;
+- a recording-level, stratified split by the metadata `id` column;
+- deterministic fixed mixture pools with seeded SNR and gain values;
+- a 256-filter, length-16 convolutional encoder, 64-channel bottleneck, and
+  six depthwise-separable convolution blocks repeated twice;
+- per-sample global layer normalisation (`gLN`) by default;
+- a two-stage vibration encoder, global pooling, and bottleneck FiLM scale/shift
+  for the multimodal model;
+- softmax source masks followed by a transposed-convolution decoder;
+- PIT SI-SDR as the audio objective, with an optional auxiliary vibration MSE
+  weighted by `lambda_vib` for the multimodal model.
 
----
+### Simulated vibration
+
+`vibration.py` turns a waveform into a same-length simulated sensor signal:
+
+1. short-time RMS envelope (`frame_size=512`, `hop_size=128`);
+2. linear interpolation back to waveform length;
+3. moving-average low-pass smoothing at approximately 300 Hz;
+4. Gaussian sensor noise and sparse transient artefacts;
+5. per-sample peak normalisation to `[-1, 1]`.
+
+At inference, the model receives vibration derived from the observed mixture
+waveform. It does not receive clean source audio or oracle per-source vibration.
+
+## Dataset setup
+
+The repository includes the small `data/cleaned_metadata.csv` manifest used by
+the final workspace. It contains the loader-required `id`, `name`, and
+`filename` fields for the 5,422 clip entries associated with 477 recording IDs
+and five species. The audio files themselves are not redistributed here.
+
+To run the code, obtain the source audio separately and place the WAV files in a
+local directory whose filenames match the manifest. The code samples ordered
+clip pairs from each split; the current implementation does not enforce a
+different-species or different-recording constraint when building a pair.
+
+This is intentional publication documentation of the archived code. The thesis
+PDF describes a different dataset summary and mixture description in places;
+see [Implementation and thesis notes](#implementation-and-thesis-notes).
 
 ## Installation
 
+Use a fresh virtual environment and install the published dependencies:
+
 ```bash
-pip install torch torchaudio librosa soundfile scikit-learn mir_eval scipy pandas tqdm
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
 
----
+The project uses PyTorch, torchaudio, NumPy, pandas, SciPy, scikit-learn,
+SoundFile, tqdm, and matplotlib. CPU execution is supported for lightweight
+checks; training and full evaluation are considerably more practical with a
+GPU.
 
 ## Training
 
-### Train both models (vibration-conditioned + audio-only baseline):
+Train the audio-only baseline:
+
 ```bash
 python train.py \
-  --wav_dir /path/to/wavfiles \
-  --metadata_csv /path/to/metadata.csv \
-  --model both \
+  --model baseline \
+  --data_root /path/to/wavfiles \
+  --metadata data/cleaned_metadata.csv \
+  --num_mixtures 3800 \
+  --num_mixtures_val 500 \
+  --num_mixtures_test 500 \
   --epochs 100 \
-  --batch_size 8 \
-  --num_mixtures 10000
+  --ckpt_dir checkpoints
 ```
 
-### Train only the vibration model:
+Train the vibration-conditioned model with the same data-pool settings:
+
 ```bash
-python train.py --wav_dir /path/to/wavfiles --model vibration
+python train.py \
+  --model multimodal \
+  --data_root /path/to/wavfiles \
+  --metadata data/cleaned_metadata.csv \
+  --num_mixtures 3800 \
+  --num_mixtures_val 500 \
+  --num_mixtures_test 500 \
+  --lambda_vib 0.1 \
+  --epochs 100 \
+  --ckpt_dir checkpoints
 ```
 
-### Train only the baseline:
-```bash
-python train.py --wav_dir /path/to/wavfiles --model audio_only
-```
-
-Output:
-- Checkpoints: `experiments/checkpoints/{model_name}/best.pt`
-- Training logs: `experiments/logs/{model_name}_training.csv`
-
----
-
-## Architecture
-
-### 1. Audio Encoder
-1-D convolutional analysis filterbank (Conv-TasNet style):
-- `Conv1d(1, 256, kernel=16, stride=8)` → latent frames
-
-### 2. Vibration Encoder (per bird, shared weights)
-Processes each bird's vibration signal **separately**:
-- 4-layer 1-D conv stack with BatchNorm + ReLU
-- Global average pooling → 128-D feature vector
-- Sum-pooling across birds → single conditioning vector
-
-### 3. FiLM-Conditioned TCN Separator
-- 3 stacks × 8 dilated depthwise-separable Conv blocks
-- After **every** block: FiLM layer modulates audio features with vibration:
-  ```
-  output = (1 + γ(vib)) × audio_feat + β(vib)
-  ```
-- Output: N speaker masks → N masked latents
-
-### 4. Audio Decoder
-ConvTranspose1d synthesis filterbank → N separated waveforms
-
-**Parameter count:** ~7.6M per model (identical for fair comparison)
-
----
-
-## Per-Bird Vibration Simulation
-
-Key design principle from the thesis: **each bird gets its own separate
-vibration signal**, derived from its own clean audio during training.
-
-```python
-VibrationSimulator.simulate(clean_audio, bird_id=n)
-```
-
-Pipeline per bird:
-1. **Temporal energy envelope** — captures activity timing (RMS sliding window)
-2. **Low-pass filter** (< 500 Hz) — mechanical low-frequency content
-3. **Per-bird identity shift** — slight temporal offset per `bird_id`
-4. **Gaussian sensor noise** — noise_std=0.02
-5. **Transient artifacts** — random spikes (prob=0.15)
-6. **Normalise** to [-1, 1]
-
-At **inference time** (no clean sources available), vibrations are derived
-from the mixture itself using different `bird_id` offsets.
-
----
-
-## Training Loop
-
-- **Loss**: 0.5 × SI-SDR + 0.5 × Multi-Scale Spectral Loss
-- **PIT**: Permutation-Invariant Training finds optimal speaker assignment
-- **Optimiser**: Adam (lr=1e-3, weight_decay=1e-5)
-- **LR Schedule**: Linear warmup (5 epochs) + Cosine annealing
-- **Early Stopping**: patience=15 epochs
-- **Mixed Precision**: via torch.cuda.amp (auto-enabled on CUDA)
-
----
+The CLI trains one model per invocation. Useful options include `--batch_size`,
+`--accum_steps`, `--norm_type`, `--num_groups`, `--sample_rate`, `--clip_dur`,
+`--num_workers`, and `--seed`. The default training pool is 3,800 mixtures;
+validation and test pools default to 500 each. Training writes run-specific
+logs below `logs/` and checkpoints below the requested checkpoint directory.
+Those generated directories and weight files are ignored by Git.
 
 ## Evaluation
 
-```bash
-python experiments/evaluate.py \
-  --wav_dir /path/to/wavfiles \
-  --metadata_csv /path/to/metadata.csv \
-  --vib_checkpoint experiments/checkpoints/vibration/best.pt \
-  --baseline_checkpoint experiments/checkpoints/audio_only/best.pt \
-  --output_dir experiments/results \
-  --num_samples 500
-```
-
-**Metrics computed** (per RQ1, RQ2, RQ3):
-| Metric | Answers |
-|--------|---------|
-| SDR (Signal-to-Distortion Ratio) | RQ1 |
-| SI-SDR (Scale-Invariant SDR) | RQ1, RQ2 |
-| SIR (Signal-to-Interference Ratio) | RQ1 |
-| SAR (Signal-to-Artifacts Ratio) | RQ1 |
-| Spectral Convergence | RQ3 |
-| Log Spectral Distance | RQ3 |
-
-**Statistical tests** (H0 vs H1, α=0.05):
-- Paired t-test
-- Wilcoxon signed-rank test
-
-**Overlap-stratified analysis** (answers RQ1 specifically):
-- Low overlap: 0–0.4
-- Medium: 0.4–0.7
-- High: 0.7–1.0 ← focus area per thesis
-
-Outputs:
-- `experiments/results/evaluation_report.json`
-- `experiments/results/vibration_results.csv`
-- `experiments/results/audio_only_results.csv`
-
----
-
-## Ablation Studies
+Evaluate a baseline checkpoint:
 
 ```bash
-python experiments/ablation.py \
-  --wav_dir /path/to/wavfiles \
-  --vib_checkpoint experiments/checkpoints/vibration/best.pt
+python eval.py \
+  --model baseline \
+  --ckpt /path/to/baseline/best.pt \
+  --data_root /path/to/wavfiles \
+  --metadata data/cleaned_metadata.csv \
+  --num_mixtures 500 \
+  --output_json results/primary/baseline_eval.json
 ```
 
-Studies run:
-1. **Noise sensitivity** (RQ2): performance vs vibration noise_std ∈ {0, 0.01, 0.02, 0.05, 0.10, 0.20}
-2. **Per-bird vs shared vibration**: quantifies the benefit of separate per-bird signals
-
----
-
-## Inference on New Files
+Evaluate the multimodal checkpoint with the same command, changing
+`--model` and `--ckpt`:
 
 ```bash
-python infer.py \
-  --input mixed_birds.wav \
-  --checkpoint experiments/checkpoints/vibration/best.pt \
-  --output_dir separated/ \
-  --num_speakers 2
+python eval.py \
+  --model multimodal \
+  --ckpt /path/to/multimodal/best.pt \
+  --data_root /path/to/wavfiles \
+  --metadata data/cleaned_metadata.csv \
+  --num_mixtures 500 \
+  --output_json results/primary/multimodal_eval.json
 ```
 
-Saves `separated/mixed_birds_separated_bird1.wav` and `_bird2.wav`.
+Evaluation reports mean and standard deviation for SI-SDR, SI-SDR improvement,
+SDR, spectral convergence, and STFT L1. It evaluates a standard test pool with
+SNR uniformly sampled from `[-1, 1]` dB and a near-zero-SNR high-overlap pool
+with SNR sampled from `[-0.5, 0.5]` dB. Use `--save_audio --audio_dir ...` only
+when local WAV examples are wanted; generated audio is ignored by Git.
 
----
+Run analysis helpers from the repository root:
 
-## Research Questions Mapping
+```bash
+python analysis/aggregate_runs.py --base_dir logs --metric val_si_sdr
+python analysis/statistical_test.py \
+  --ckpt_a /path/to/baseline/best.pt \
+  --ckpt_b /path/to/multimodal/best.pt \
+  --data_root /path/to/wavfiles \
+  --metadata data/cleaned_metadata.csv \
+  --num_mixtures 500 \
+  --output_json results/statistics/wilcoxon_results.json
+```
 
-| RQ | Component |
-|----|-----------|
-| RQ1: Separation performance vs overlap | `evaluate.py` → stratified_analysis |
-| RQ2: Vibration signal effectiveness | `ablation.py` → noise sensitivity, per-bird study |
-| RQ3: Preservation of acoustic features | `evaluate.py` → spectral_convergence, log_spectral_distance |
+For the pooled analysis, provide two directories containing the cached
+`sisdri_model_a.npy` and `sisdri_model_b.npy` arrays:
 
----
+```bash
+python analysis/pooled_wilcoxon.py \
+  --run_1_dir /path/to/stat_cache/run_1 \
+  --run_2_dir /path/to/stat_cache/run_2 \
+  --output_json results/statistics/pooled_wilcoxon_results.json
+```
 
-## Hypotheses
+These scripts do not launch training automatically and do not download data.
 
-- **H0**: No performance difference between audio-only and vibration-conditioned
-- **H1**: Vibration-conditioned improves SDR and SI-SDR, especially in overlap-heavy segments
+## Thesis results
 
-Results are reported with p-values from both paired t-test and Wilcoxon signed-rank test
-at significance level α = 0.05.
+The following are the headline values reported in the submitted thesis. They
+are two-run averages; the small per-run inputs are preserved in
+`results/primary/` and `results/ablation/`.
 
----
+| Test condition | Audio-only SI-SDRi | Multimodal SI-SDRi | Absolute improvement |
+| --- | ---: | ---: | ---: |
+| Standard (`[-1, 1]` dB SNR) | 3.652 dB | 4.618 dB | +0.966 dB |
+| High-overlap (`[-0.5, 0.5]` dB SNR) | 3.541 dB | 4.618 dB | +1.077 dB |
 
-## References
+The pooled statistical artifact contains 2,000 source estimates, median paired
+improvement `0.491 dB`, 95% bootstrap CI `[0.426, 0.568] dB`, and
+`p = 2.2420775429197073e-44`. The ablation summaries retain the raw per-seed
+JSON values for `lambda_vib` in `{0.0, 0.05, 0.1, 0.20, 0.5}`.
 
-1. Défossez et al. (2019). Music source separation in the waveform domain. arXiv:1911.13254
-2. Hershey et al. (2016). Deep clustering. ICASSP
-3. Kahl et al. (2022). BirdCLEF 2022. CLEF Working Notes
-4. Kahl et al. (2021). BirdNET. Ecological Informatics
-5. Luo & Mesgarani (2019). Conv-TasNet. IEEE/ACM TASLP
-6. Perez et al. (2018). FiLM. AAAI
-7. Stowell et al. (2019). Bird Audio Detection. Methods in Ecology and Evolution
-8. Wang & Chen (2018). Supervised speech separation. IEEE/ACM TASLP
+## Reproducibility and limitations
+
+The fixed mixture pools, recording-level split, stored seeds, and preserved
+result JSON files support inspection and rerunning with the same local inputs.
+The repository is not a fully self-contained reproduction because the source
+audio dataset and trained checkpoints are not redistributed. Dataset licences,
+download terms, and the exact local audio files must be checked before running
+new experiments.
+
+Other limitations include simulated rather than measured vibration, a fixed
+two-source separation problem, stochastic sensor-noise/transient simulation,
+and the pairing behavior described in the dataset section. Checkpoints should
+remain outside normal Git history; if sharing weights later is useful, a review
+can consider a GitHub Release rather than committing model dumps.
+
+## Repository layout
+
+```text
+.
+├── dataset.py                 # manifest, split, mixture pools, data loading
+├── vibration.py               # simulated vibration signal
+├── model.py                   # baseline and multimodal separators
+├── loss.py                    # PIT SI-SDR and auxiliary vibration loss
+├── train.py                   # training CLI
+├── eval.py                    # evaluation CLI
+├── analysis/
+│   ├── aggregate_runs.py
+│   ├── statistical_test.py
+│   └── pooled_wilcoxon.py
+├── data/cleaned_metadata.csv  # small audio manifest; no WAV data
+├── results/                   # curated JSON summaries
+├── assets/                    # selected thesis-era figures
+├── notebooks/                 # vibration simulation walkthrough
+└── docs/thesis/
+    └── Thesis-Final-Submission.pdf
+```
+
+## Implementation and thesis notes
+
+The PDF is the final submitted academic artifact and is preserved unchanged.
+The executable source is documented according to its actual behavior. The
+submitted thesis and the archived implementation contain several historical
+description differences, including the dataset-size summary, the default
+normalisation (`gLN` in code versus group normalisation in the thesis text),
+mask wording (softmax in code versus sigmoid in the thesis figure/text), and
+some vibration-encoder and mixture-pool details. The code and numerical result
+files were not changed to make these descriptions superficially agree.
+
+The statistical script uses SciPy's directional `alternative="greater"`
+Wilcoxon calculation, while the submitted thesis calls the reported test
+two-sided. The archived JSON values are preserved exactly; this distinction
+should be resolved or explicitly discussed before claiming an independently
+recomputed statistical result.
+
+Development was carried out during the bachelor's thesis project in spring
+2026. The repository initially contained an earlier prototype and was
+synchronized with the final local implementation in September 2026. The
+publication commits in this repository are current synchronization/publication
+work; they do not backdate the research or rewrite the earlier Git history.
+
+## License
+
+The code is released under the MIT License. The external bird recordings are
+not part of this repository and remain subject to their original licences and
+terms.
