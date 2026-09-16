@@ -1,0 +1,26 @@
+{
+  "model": "baseline",
+  "ckpt": "./checkpoints/baseline/run_1 -- 03-01 -- 05-05/best.pt",
+  "standard": {
+    "SI-SDR_mean": 4.187491416931152,
+    "SI-SDR_std": 5.505049228668213,
+    "SI-SDRi_mean": 4.188952922821045,
+    "SI-SDRi_std": 5.501533508300781,
+    "SDR_mean": 4.160937309265137,
+    "SDR_std": 5.4910478591918945,
+    "SpectralConv": 229.9239355193244,
+    "STFT_L1": 4.4361616354140025,
+    "n_samples": 1000
+  },
+  "high_overlap": {
+    "SI-SDR_mean": 4.049918174743652,
+    "SI-SDR_std": 5.366339683532715,
+    "SI-SDRi_mean": 4.054311752319336,
+    "SI-SDRi_std": 5.35927677154541,
+    "SDR_mean": 4.02763032913208,
+    "SDR_std": 5.35824728012085,
+    "SpectralConv": 225.49201369285583,
+    "STFT_L1": 4.404590171480936,
+    "n_samples": 1000
+  }
+}

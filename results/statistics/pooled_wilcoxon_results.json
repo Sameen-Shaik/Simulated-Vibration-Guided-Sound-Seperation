@@ -1,0 +1,11 @@
+{
+  "n_samples": 2000,
+  "run_1_samples": 1000,
+  "run_2_samples": 1000,
+  "wilcoxon_stat": 1360122.0,
+  "p_value": 2.2420775429197073e-44,
+  "median_diff_dB": 0.49144816398620605,
+  "ci_95_lo": 0.4256622791290283,
+  "ci_95_hi": 0.5675892233848572,
+  "h0_rejected": true
+}

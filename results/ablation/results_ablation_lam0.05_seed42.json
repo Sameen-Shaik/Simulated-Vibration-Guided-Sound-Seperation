@@ -1,0 +1,26 @@
+{
+  "model": "multimodal",
+  "ckpt": "./checkpoints/ablation_lam0.05_seed_42/multimodal/run_12 -- 19-41 -- 05-10/best.pt",
+  "standard": {
+    "SI-SDR_mean": 5.747067451477051,
+    "SI-SDR_std": 6.194991588592529,
+    "SI-SDRi_mean": 5.748528957366943,
+    "SI-SDRi_std": 6.190248012542725,
+    "SDR_mean": 5.723462104797363,
+    "SDR_std": 6.178531169891357,
+    "SpectralConv": 88.558285849435,
+    "STFT_L1": 4.954375906596108,
+    "n_samples": 1000
+  },
+  "high_overlap": {
+    "SI-SDR_mean": 5.759228706359863,
+    "SI-SDR_std": 6.030013084411621,
+    "SI-SDRi_mean": 5.763622283935547,
+    "SI-SDRi_std": 6.0220513343811035,
+    "SDR_mean": 5.744004726409912,
+    "SDR_std": 6.027765274047852,
+    "SpectralConv": 85.86686179751442,
+    "STFT_L1": 4.943737552279518,
+    "n_samples": 1000
+  }
+}

@@ -1,0 +1,326 @@
+[
+    {
+        "file": "results_ablation_lam0.05_seed42.json",
+        "metrics": {
+            "standard": {
+                "SI-SDR_mean": 5.747067451477051,
+                "SI-SDR_std": 6.194991588592529,
+                "SI-SDRi_mean": 5.748528957366943,
+                "SI-SDRi_std": 6.190248012542725,
+                "SDR_mean": 5.723462104797363,
+                "SDR_std": 6.178531169891357,
+                "SpectralConv": 88.558285849435,
+                "STFT_L1": 4.954375906596108,
+                "n_samples": 1000.0
+            },
+            "high_overlap": {
+                "SI-SDR_mean": 5.759228706359863,
+                "SI-SDR_std": 6.030013084411621,
+                "SI-SDRi_mean": 5.763622283935547,
+                "SI-SDRi_std": 6.022051334381103,
+                "SDR_mean": 5.744004726409912,
+                "SDR_std": 6.027765274047852,
+                "SpectralConv": 85.86686179751442,
+                "STFT_L1": 4.943737552279518,
+                "n_samples": 1000.0
+            }
+        }
+    },
+    {
+        "file": "results_ablation_lam0.05_seed67.json",
+        "metrics": {
+            "standard": {
+                "SI-SDR_mean": 6.10350227355957,
+                "SI-SDR_std": 6.251405239105225,
+                "SI-SDRi_mean": 6.104964733123779,
+                "SI-SDRi_std": 6.242880344390869,
+                "SDR_mean": 6.082552433013916,
+                "SDR_std": 6.224526882171631,
+                "SpectralConv": 89.73580950782413,
+                "STFT_L1": 4.942024692656502,
+                "n_samples": 1000.0
+            },
+            "high_overlap": {
+                "SI-SDR_mean": 5.916751861572266,
+                "SI-SDR_std": 6.031506061553955,
+                "SI-SDRi_mean": 5.921145439147949,
+                "SI-SDRi_std": 6.023229122161865,
+                "SDR_mean": 5.903126239776611,
+                "SDR_std": 6.026051998138428,
+                "SpectralConv": 86.31045162866987,
+                "STFT_L1": 4.928988199385386,
+                "n_samples": 1000.0
+            }
+        }
+    },
+    {
+        "file": "results_ablation_lam0.0_seed42.json",
+        "metrics": {
+            "standard": {
+                "SI-SDR_mean": 5.7101969718933105,
+                "SI-SDR_std": 6.148909091949463,
+                "SI-SDRi_mean": 5.711658954620361,
+                "SI-SDRi_std": 6.140459060668945,
+                "SDR_mean": 5.683100700378418,
+                "SDR_std": 6.12651777267456,
+                "SpectralConv": 90.4792363605802,
+                "STFT_L1": 4.974544714367579,
+                "n_samples": 1000.0
+            },
+            "high_overlap": {
+                "SI-SDR_mean": 5.671380043029785,
+                "SI-SDR_std": 5.920007228851318,
+                "SI-SDRi_mean": 5.6757731437683105,
+                "SI-SDRi_std": 5.912553310394287,
+                "SDR_mean": 5.65097713470459,
+                "SDR_std": 5.909609317779541,
+                "SpectralConv": 87.52066766648065,
+                "STFT_L1": 4.9607422276148725,
+                "n_samples": 1000.0
+            }
+        }
+    },
+    {
+        "file": "results_ablation_lam0.0_seed67.json",
+        "metrics": {
+            "standard": {
+                "SI-SDR_mean": 5.879718780517578,
+                "SI-SDR_std": 6.286049842834473,
+                "SI-SDRi_mean": 5.881180286407471,
+                "SI-SDRi_std": 6.276631355285644,
+                "SDR_mean": 5.858865261077881,
+                "SDR_std": 6.255364418029785,
+                "SpectralConv": 88.97188107929533,
+                "STFT_L1": 4.951444996727837,
+                "n_samples": 1000.0
+            },
+            "high_overlap": {
+                "SI-SDR_mean": 5.762722969055176,
+                "SI-SDR_std": 6.073867797851562,
+                "SI-SDRi_mean": 5.767116069793701,
+                "SI-SDRi_std": 6.066000461578369,
+                "SDR_mean": 5.747125625610352,
+                "SDR_std": 6.065896511077881,
+                "SpectralConv": 85.91639097910078,
+                "STFT_L1": 4.93340788190327,
+                "n_samples": 1000.0
+            }
+        }
+    },
+    {
+        "file": "results_ablation_lam0.1_seed42.json",
+        "metrics": {
+            "standard": {
+                "SI-SDR_mean": 5.572617530822754,
+                "SI-SDR_std": 6.12146520614624,
+                "SI-SDRi_mean": 5.5740790367126465,
+                "SI-SDRi_std": 6.114196300506592,
+                "SDR_mean": 5.549746036529541,
+                "SDR_std": 6.103392601013184,
+                "SpectralConv": 89.17619366115994,
+                "STFT_L1": 4.957824801641797,
+                "n_samples": 1000.0
+            },
+            "high_overlap": {
+                "SI-SDR_mean": 5.642117977142334,
+                "SI-SDR_std": 6.111622333526611,
+                "SI-SDRi_mean": 5.646511077880859,
+                "SI-SDRi_std": 6.103641033172607,
+                "SDR_mean": 5.624892711639404,
+                "SDR_std": 6.105461597442627,
+                "SpectralConv": 86.55250210232205,
+                "STFT_L1": 4.943234890226334,
+                "n_samples": 1000.0
+            }
+        }
+    },
+    {
+        "file": "results_ablation_lam0.1_seed67.json",
+        "metrics": {
+            "standard": {
+                "SI-SDR_mean": 3.659924745559692,
+                "SI-SDR_std": 4.751945495605469,
+                "SI-SDRi_mean": 3.6613869667053223,
+                "SI-SDRi_std": 4.731205940246582,
+                "SDR_mean": 3.642817974090576,
+                "SDR_std": 4.732934951782227,
+                "SpectralConv": 55.94564168415372,
+                "STFT_L1": 4.889761186781383,
+                "n_samples": 1000.0
+            },
+            "high_overlap": {
+                "SI-SDR_mean": 3.585928916931152,
+                "SI-SDR_std": 4.453467845916748,
+                "SI-SDRi_mean": 3.590322256088257,
+                "SI-SDRi_std": 4.445781230926514,
+                "SDR_mean": 3.567487716674804,
+                "SDR_std": 4.44559907913208,
+                "SpectralConv": 54.02535405234685,
+                "STFT_L1": 4.87886291080051,
+                "n_samples": 1000.0
+            }
+        }
+    },
+    {
+        "file": "results_ablation_lam0.20_seed42.json",
+        "metrics": {
+            "standard": {
+                "SI-SDR_mean": 5.754905700683594,
+                "SI-SDR_std": 6.08245038986206,
+                "SI-SDRi_mean": 5.7563676834106445,
+                "SI-SDRi_std": 6.076521396636963,
+                "SDR_mean": 5.731487274169922,
+                "SDR_std": 6.06643533706665,
+                "SpectralConv": 89.7562241327195,
+                "STFT_L1": 4.965274216636779,
+                "n_samples": 1000.0
+            },
+            "high_overlap": {
+                "SI-SDR_mean": 5.77023458480835,
+                "SI-SDR_std": 6.021429538726807,
+                "SI-SDRi_mean": 5.774628162384033,
+                "SI-SDRi_std": 6.012691497802734,
+                "SDR_mean": 5.754972457885742,
+                "SDR_std": 6.015413761138916,
+                "SpectralConv": 86.74657506791372,
+                "STFT_L1": 4.955320256096976,
+                "n_samples": 1000.0
+            }
+        }
+    },
+    {
+        "file": "results_ablation_lam0.20_seed67.json",
+        "metrics": {
+            "standard": {
+                "SI-SDR_mean": 6.064449310302734,
+                "SI-SDR_std": 6.269690990447998,
+                "SI-SDRi_mean": 6.065911293029785,
+                "SI-SDRi_std": 6.260263442993164,
+                "SDR_mean": 6.042690753936768,
+                "SDR_std": 6.240439891815185,
+                "SpectralConv": 88.59577094184027,
+                "STFT_L1": 4.928562894700065,
+                "n_samples": 1000.0
+            },
+            "high_overlap": {
+                "SI-SDR_mean": 5.898227214813232,
+                "SI-SDR_std": 6.069332599639893,
+                "SI-SDRi_mean": 5.902621269226074,
+                "SI-SDRi_std": 6.061906814575195,
+                "SDR_mean": 5.881916046142578,
+                "SDR_std": 6.061560153961182,
+                "SpectralConv": 85.40074115329318,
+                "STFT_L1": 4.914269137004065,
+                "n_samples": 1000.0
+            }
+        }
+    },
+    {
+        "file": "results_ablation_lam0.5_seed42.json",
+        "metrics": {
+            "standard": {
+                "SI-SDR_mean": 5.481633186340332,
+                "SI-SDR_std": 5.988544940948486,
+                "SI-SDRi_mean": 5.483095645904541,
+                "SI-SDRi_std": 5.982578754425049,
+                "SDR_mean": 5.463899612426758,
+                "SDR_std": 5.982433795928955,
+                "SpectralConv": 92.79337474278041,
+                "STFT_L1": 4.9901415242089175,
+                "n_samples": 1000.0
+            },
+            "high_overlap": {
+                "SI-SDR_mean": 5.572495460510254,
+                "SI-SDR_std": 5.9101762771606445,
+                "SI-SDRi_mean": 5.576888561248779,
+                "SI-SDRi_std": 5.9023284912109375,
+                "SDR_mean": 5.556020736694336,
+                "SDR_std": 5.90500020980835,
+                "SpectralConv": 90.41351282028924,
+                "STFT_L1": 4.972979329881214,
+                "n_samples": 1000.0
+            }
+        }
+    },
+    {
+        "file": "results_ablation_lam0.5_seed67.json",
+        "metrics": {
+            "standard": {
+                "SI-SDR_mean": 6.072677135467529,
+                "SI-SDR_std": 6.217364311218262,
+                "SI-SDRi_mean": 6.07413911819458,
+                "SI-SDRi_std": 6.208947658538818,
+                "SDR_mean": 6.05031681060791,
+                "SDR_std": 6.188592433929443,
+                "SpectralConv": 89.39267209976438,
+                "STFT_L1": 4.9437672713446235,
+                "n_samples": 1000.0
+            },
+            "high_overlap": {
+                "SI-SDR_mean": 5.955371856689453,
+                "SI-SDR_std": 5.974449634552002,
+                "SI-SDRi_mean": 5.959765911102295,
+                "SI-SDRi_std": 5.966378688812256,
+                "SDR_mean": 5.940221309661865,
+                "SDR_std": 5.965665817260742,
+                "SpectralConv": 86.16028934054904,
+                "STFT_L1": 4.930920426807706,
+                "n_samples": 1000.0
+            }
+        }
+    },
+    {
+        "file": "results_baseline_run_1.json",
+        "metrics": {
+            "standard": {
+                "SI-SDR_mean": 4.187491416931152,
+                "SI-SDR_std": 5.505049228668213,
+                "SI-SDRi_mean": 4.188952922821045,
+                "SI-SDRi_std": 5.501533508300781,
+                "SDR_mean": 4.160937309265137,
+                "SDR_std": 5.491047859191894,
+                "SpectralConv": 229.9239355193244,
+                "STFT_L1": 4.436161635414002,
+                "n_samples": 1000.0
+            },
+            "high_overlap": {
+                "SI-SDR_mean": 4.049918174743652,
+                "SI-SDR_std": 5.366339683532715,
+                "SI-SDRi_mean": 4.054311752319336,
+                "SI-SDRi_std": 5.35927677154541,
+                "SDR_mean": 4.02763032913208,
+                "SDR_std": 5.35824728012085,
+                "SpectralConv": 225.49201369285583,
+                "STFT_L1": 4.404590171480936,
+                "n_samples": 1000.0
+            }
+        }
+    },
+    {
+        "file": "results_baseline_run_2.json",
+        "metrics": {
+            "standard": {
+                "SI-SDR_mean": 3.114052295684814,
+                "SI-SDR_std": 4.293388366699219,
+                "SI-SDRi_mean": 3.115513801574707,
+                "SI-SDRi_std": 4.271182537078857,
+                "SDR_mean": 3.091108083724975,
+                "SDR_std": 4.285896301269531,
+                "SpectralConv": 55.776089501759365,
+                "STFT_L1": 4.7349408562221225,
+                "n_samples": 1000.0
+            },
+            "high_overlap": {
+                "SI-SDR_mean": 3.022697210311889,
+                "SI-SDR_std": 4.032345771789551,
+                "SI-SDRi_mean": 3.027090787887573,
+                "SI-SDRi_std": 4.018208026885986,
+                "SDR_mean": 2.9966013431549072,
+                "SDR_std": 4.024549961090088,
+                "SpectralConv": 54.10702529786125,
+                "STFT_L1": 4.723680810322837,
+                "n_samples": 1000.0
+            }
+        }
+    }
+]

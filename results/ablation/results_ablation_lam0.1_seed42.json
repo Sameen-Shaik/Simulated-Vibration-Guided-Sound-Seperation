@@ -1,0 +1,26 @@
+{
+  "model": "multimodal",
+  "ckpt": "./checkpoints/multimodal/run_1 -- 03-22 -- 05-05/best.pt",
+  "standard": {
+    "SI-SDR_mean": 5.572617530822754,
+    "SI-SDR_std": 6.12146520614624,
+    "SI-SDRi_mean": 5.5740790367126465,
+    "SI-SDRi_std": 6.114196300506592,
+    "SDR_mean": 5.549746036529541,
+    "SDR_std": 6.103392601013184,
+    "SpectralConv": 89.17619366115994,
+    "STFT_L1": 4.957824801641797,
+    "n_samples": 1000
+  },
+  "high_overlap": {
+    "SI-SDR_mean": 5.642117977142334,
+    "SI-SDR_std": 6.111622333526611,
+    "SI-SDRi_mean": 5.646511077880859,
+    "SI-SDRi_std": 6.103641033172607,
+    "SDR_mean": 5.624892711639404,
+    "SDR_std": 6.105461597442627,
+    "SpectralConv": 86.55250210232205,
+    "STFT_L1": 4.943234890226334,
+    "n_samples": 1000
+  }
+}
