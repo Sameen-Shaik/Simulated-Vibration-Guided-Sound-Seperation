@@ -164,3 +164,45 @@ dataset/
 experiments/checkpoints/
 notebooks and experimentation/data
 Backup/
+
+# Python caches and test output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Local environments and editor state
+.venv/
+venv/
+env/
+.env
+.idea/
+.vscode/
+
+# Codex/agent/editor state
+.codex/
+.agents/
+.windsurf/
+
+# Model checkpoints and generated training state
+checkpoints/
+**/checkpoints/
+*.pt
+*.pth
+*.ckpt
+
+# Local datasets and generated audio
+dataset/wavfiles/
+data/wavfiles/
+**/wavfiles/
+eval_audio*/
+separated/
+outputs/
+
+# Statistical caches and temporary/generated experiment directories
+stat_cache/
+cache/
+tmp/
+generated/
+experiments/results/
+experiments/ablation_results/
